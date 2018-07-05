@@ -23,6 +23,8 @@ void main() async {
 
   final bean = PostBean(_adapter);
 
+  await bean.drop();
+
   sb.write('Creating table ...');
   await bean.createTable();
   sb.writeln(' successful!');
@@ -36,15 +38,15 @@ void main() async {
 
   // Insert some posts
   sb.writeln('Inserting sample rows ...');
-  int id1 = await bean.insert(new Post.make(1, 'Coffee?', 'Mark'));
+  int id1 = await bean.insert(new Post.make(1, 'Coffee?', false, DateTime.now()));
   sb.writeln('Inserted successfully row with id: $id1!');
-  int id2 = await bean.insert(new Post.make(2, 'Sure!', 'Bob'));
+  int id2 = await bean.insert(new Post.make(2, 'Sure!', true, DateTime.now()));
   sb.writeln('Inserted successfully row with id: $id2!');
   sb.writeln('--------------');
 
   // Find one post
   sb.writeln('Reading row with id $id1 ...');
-  Post post1 = await bean.findOne(id1);
+  Post post1 = await bean.find(id1);
   sb.writeln(post1);
   sb.writeln('--------------');
 
@@ -56,13 +58,13 @@ void main() async {
 
   // Update a post
   sb.write('Updating a column in row with id $id1 ...');
-  await bean.update(id1, 'Sam');
+  await bean.updateReadField(id1, true);
   sb.writeln(' successful!');
   sb.writeln('--------------');
 
   // Find one post
   sb.writeln('Reading row with $id1 to check the update ...');
-  post1 = await bean.findOne(id1);
+  post1 = await bean.find(id1);
   sb.writeln(post1);
   sb.writeln('--------------');
 
