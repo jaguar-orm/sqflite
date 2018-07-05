@@ -7,7 +7,8 @@ import 'package:sqflite_example/main.dart' as sqflite_example;
 
 void main() {
   testWidgets('Hello world smoke test', (WidgetTester tester) async {
-    sqflite_example.main(); // builds the app and schedules a frame but doesn't trigger one
+    sqflite_example
+        .main(); // builds the app and schedules a frame but doesn't trigger one
     await tester.pump(); // triggers a frame
 
     // expect(find.text('Hello, world!'), findsOneWidget);

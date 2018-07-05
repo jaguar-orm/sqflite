@@ -9,18 +9,25 @@ part 'post.jorm.dart';
 class Post {
   Post();
 
-  Post.make(this.id, this.msg, this.read, this.at);
+  Post.make(this.id, this.msg, this.stars, this.read, this.at);
 
   @PrimaryKey()
   int id;
 
+  @Column(nullable: true)
   String msg;
 
+  @Column(nullable: true)
   bool read;
 
+  @Column(nullable: true)
+  double stars;
+
+  @Column(nullable: true)
   DateTime at;
 
-  String toString() => 'Post(id: $id, message: $msg read: $read, at: $at)';
+  String toString() =>
+      'Post(id: $id, message: $msg, stars: $stars, read: $read, at: $at)';
 
   static String get tableName => 'posts';
 }

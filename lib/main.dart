@@ -38,10 +38,17 @@ void main() async {
 
   // Insert some posts
   sb.writeln('Inserting sample rows ...');
-  int id1 = await bean.insert(new Post.make(1, 'Coffee?', false, DateTime.now()));
+  int id1 = await bean
+      .insert(new Post.make(1, 'Coffee?', 4.5, false, DateTime.now()));
   sb.writeln('Inserted successfully row with id: $id1!');
-  int id2 = await bean.insert(new Post.make(2, 'Sure!', true, DateTime.now()));
+  int id2 =
+      await bean.insert(new Post.make(2, 'Sure!', 5.0, true, DateTime.now()));
   sb.writeln('Inserted successfully row with id: $id2!');
+  /*
+  int id3 =
+      await bean.insert(new Post.make(3, null, 5.0, true, DateTime.now()));
+  sb.writeln('Inserted successfully row with id: $id3!');
+  */
   sb.writeln('--------------');
 
   // Find one post

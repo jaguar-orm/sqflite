@@ -15,6 +15,8 @@ abstract class _PostBean implements Bean<Post> {
 
   final BoolField read = new BoolField('read');
 
+  final DoubleField stars = new DoubleField('stars');
+
   final DateTimeField at = new DateTimeField('at');
 
   Post fromMap(Map map) {
@@ -23,6 +25,7 @@ abstract class _PostBean implements Bean<Post> {
     model.id = adapter.parseValue(map['id']);
     model.msg = adapter.parseValue(map['msg']);
     model.read = adapter.parseValue(map['read']);
+    model.stars = adapter.parseValue(map['stars']);
     model.at = adapter.parseValue(map['at']);
 
     return model;
@@ -34,6 +37,7 @@ abstract class _PostBean implements Bean<Post> {
     ret.add(id.set(model.id));
     ret.add(msg.set(model.msg));
     ret.add(read.set(model.read));
+    ret.add(stars.set(model.stars));
     ret.add(at.set(model.at));
 
     return ret;
@@ -44,6 +48,7 @@ abstract class _PostBean implements Bean<Post> {
     st.addInt(id.name, primary: true);
     st.addStr(msg.name);
     st.addBool(read.name);
+    st.addInt(stars.name);
     st.addDateTime(at.name);
     return execCreateTable(st);
   }
