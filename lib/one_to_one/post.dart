@@ -52,7 +52,4 @@ class PostBean extends Bean<Post> with _PostBean {
     Update st = updater.where(this.id.eq(id)).set(this.read, read);
     return execUpdate(st);
   }
-
-  /// Finds all posts
-  Future<List<Post>> findAll() async => (await execFind(finder)).toList();
 }

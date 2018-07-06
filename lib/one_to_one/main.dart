@@ -72,7 +72,8 @@ void main() async {
 
     // Find all posts
     sb.writeln('Reading all rows ...');
-    List<Post> posts = await bean.findAll();
+    List<Post> posts = await bean.getAll();
+    await bean.preloadAll(posts);
     posts.forEach((p) => sb.writeln(p));
     sb.writeln('--------------');
 
@@ -84,7 +85,7 @@ void main() async {
 
     // Find one post
     sb.writeln('Reading row with $id1 to check the update ...');
-    post1 = await bean.find(id1);
+    post1 = await bean.find(id1, preload: true);
     sb.writeln(post1);
     sb.writeln('--------------');
 
@@ -94,7 +95,8 @@ void main() async {
 
     // Find all posts
     sb.writeln('Reading all rows ...');
-    posts = await bean.findAll();
+    posts = await bean.getAll();
+    await bean.preloadAll(posts);
     posts.forEach((p) => sb.writeln(p));
     sb.writeln('--------------');
 

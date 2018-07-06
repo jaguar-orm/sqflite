@@ -30,7 +30,4 @@ class Item {
 @GenBean()
 class ItemBean extends Bean<Item> with _ItemBean {
   ItemBean(Adapter adapter) : super(adapter);
-
-  /// Finds all items
-  Future<List<Item>> findAll() async => (await execFind(finder)).toList();
 }
