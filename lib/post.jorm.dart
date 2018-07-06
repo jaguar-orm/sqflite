@@ -53,20 +53,44 @@ abstract class _PostBean implements Bean<Post> {
     return execCreateTable(st);
   }
 
-  Future<dynamic> insert(Post model) async {
+  Future<Null> insert(Post model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    return execInsert(insert);
+    await execInsert(insert);
+    if (cascade) {
+      Post newModel;
+      if (model.item != null) {
+        newModel ??= await find(model.id);
+        itemBean.associatePost(model.item, newModel);
+        await itemBean.insert(model.item);
+      }
+    }
   }
 
-  Future<int> update(Post model) async {
+  Future<int> update(Post model,
+      {bool cascade: false, bool associate: false}) async {
     final Update update =
         updater.where(this.id.eq(model.id)).setMany(toSetColumns(model));
-    return execUpdate(update);
+    final ret = execUpdate(update);
+    if (cascade) {
+      Post newModel;
+      if (model.item != null) {
+        if (associate) {
+          newModel ??= await find(model.id);
+          itemBean.associatePost(model.item, newModel);
+        }
+        await itemBean.update(model.item);
+      }
+    }
+    return ret;
   }
 
   Future<Post> find(int id, {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
-    return await execFindOne(find);
+    final Post model = await execFindOne(find);
+    if (preload) {
+      await this.preload(model, cascade: cascade);
+    }
+    return model;
   }
 
   Future<List<Post>> findWhere(Expression exp) async {
@@ -74,7 +98,11 @@ abstract class _PostBean implements Bean<Post> {
     return await (await execFind(find)).toList();
   }
 
-  Future<int> remove(int id) async {
+  Future<int> remove(int id, [bool cascade = false]) async {
+    if (cascade) {
+      final Post newModel = await find(id);
+      await itemBean.removeByPost(newModel.id);
+    }
     final Remove remove = remover.where(this.id.eq(id));
     return execRemove(remove);
   }
@@ -90,4 +118,21 @@ abstract class _PostBean implements Bean<Post> {
   Future<int> removeWhere(Expression exp) async {
     return execRemove(remover.where(exp));
   }
+
+  Future preload(Post model, {bool cascade: false}) async {
+    model.item =
+    await itemBean.findByPost(model.id, preload: cascade, cascade: cascade);
+  }
+
+  Future preloadAll(List<Post> models, {bool cascade: false}) async {
+    await PreloadHelper.preload<Post, Item>(
+        models,
+            (Post model) => [model.id],
+        itemBean.findByPostList,
+            (Item model) => [model.postId],
+            (Post model, Item child) => model.item = child,
+        cascade: cascade);
+  }
+
+  ItemBean get itemBean;
 }
