@@ -58,10 +58,12 @@ abstract class _PostBean implements Bean<Post> {
     var retId = await execInsert(insert);
     if (cascade) {
       Post newModel;
-      if (model.item != null) {
+      if (model.items != null) {
         newModel ??= await find(retId);
-        itemBean.associatePost(model.item, newModel);
-        await itemBean.insert(model.item);
+        model.items.forEach((x) => itemBean.associatePost(x, newModel));
+        for (final child in model.items) {
+          await itemBean.insert(child);
+        }
       }
     }
     return retId;
@@ -74,12 +76,14 @@ abstract class _PostBean implements Bean<Post> {
     final ret = execUpdate(update);
     if (cascade) {
       Post newModel;
-      if (model.item != null) {
+      if (model.items != null) {
         if (associate) {
           newModel ??= await find(model.id);
-          itemBean.associatePost(model.item, newModel);
+          model.items.forEach((x) => itemBean.associatePost(x, newModel));
         }
-        await itemBean.update(model.item);
+        for (final child in model.items) {
+          await itemBean.update(child);
+        }
       }
     }
     return ret;
@@ -121,17 +125,18 @@ abstract class _PostBean implements Bean<Post> {
   }
 
   Future preload(Post model, {bool cascade: false}) async {
-    model.item =
+    model.items =
         await itemBean.findByPost(model.id, preload: cascade, cascade: cascade);
   }
 
   Future preloadAll(List<Post> models, {bool cascade: false}) async {
+    models.forEach((Post model) => model.items ??= []);
     await PreloadHelper.preload<Post, Item>(
         models,
         (Post model) => [model.id],
         itemBean.findByPostList,
         (Item model) => [model.postId],
-        (Post model, Item child) => model.item = child,
+        (Post model, Item child) => model.items.add(child),
         cascade: cascade);
   }
 
