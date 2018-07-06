@@ -3,8 +3,10 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:jaguar_query_sqflite/jaguar_query_sqflite.dart';
+import 'package:path/path.dart' as path;
+import 'package:sqflite/sqflite.dart';
+
 import 'post.dart';
 
 /// The adapter
@@ -16,7 +18,8 @@ void main() async {
 
   sb.writeln('--------------');
   sb.write('Connecting ...');
-  _adapter = new SqfliteAdapter(await getDatabasesPath());
+  var dbPath = await getDatabasesPath();
+  _adapter = new SqfliteAdapter(path.join(dbPath, "test.db"));
   await _adapter.connect();
   sb.writeln(' successful!');
   sb.writeln('--------------');
