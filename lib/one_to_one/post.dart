@@ -6,8 +6,6 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'item.dart';
 
 part 'post.jorm.dart';
-// import 'package:jaguar_query_sqflite/jaguar_query_sqflite.dart';
-
 
 // The model
 class Post {

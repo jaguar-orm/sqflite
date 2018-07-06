@@ -45,7 +45,7 @@ abstract class _PostBean implements Bean<Post> {
 
   Future createTable() async {
     final st = Sql.create(tableName);
-    st.addInt(id.name, primary: true);
+    st.addInt(id.name, primary: true, autoIncrement: true);
     st.addStr(msg.name);
     st.addBool(read.name);
     st.addInt(stars.name);
@@ -53,9 +53,9 @@ abstract class _PostBean implements Bean<Post> {
     return execCreateTable(st);
   }
 
-  Future<Null> insert(Post model, {bool cascade: false}) async {
+  Future<dynamic> insert(Post model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    await execInsert(insert);
+    var retId = await execInsert(insert);
     if (cascade) {
       Post newModel;
       if (model.item != null) {
@@ -64,6 +64,7 @@ abstract class _PostBean implements Bean<Post> {
         await itemBean.insert(model.item);
       }
     }
+    return retId;
   }
 
   Future<int> update(Post model,
@@ -121,16 +122,16 @@ abstract class _PostBean implements Bean<Post> {
 
   Future preload(Post model, {bool cascade: false}) async {
     model.item =
-    await itemBean.findByPost(model.id, preload: cascade, cascade: cascade);
+        await itemBean.findByPost(model.id, preload: cascade, cascade: cascade);
   }
 
   Future preloadAll(List<Post> models, {bool cascade: false}) async {
     await PreloadHelper.preload<Post, Item>(
         models,
-            (Post model) => [model.id],
+        (Post model) => [model.id],
         itemBean.findByPostList,
-            (Item model) => [model.postId],
-            (Post model, Item child) => model.item = child,
+        (Item model) => [model.postId],
+        (Post model, Item child) => model.item = child,
         cascade: cascade);
   }
 
