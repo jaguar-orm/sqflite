@@ -146,6 +146,5 @@ abstract class _PivotBean implements Bean<Pivot> {
   }
 
   PostBean get postBean;
-
   ItemBean get itemBean;
 }

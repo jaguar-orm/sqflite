@@ -32,8 +32,18 @@ class Item {
 class ItemBean extends Bean<Item> with _ItemBean {
   ItemBean(Adapter adapter) : super(adapter);
 
-  final PostBean postBean;
-  final PivotBean pivotBean;
+  PivotBean _pivotBean;
+  PostBean _postBean;
+
+  PostBean get postBean {
+    _postBean ??= new PostBean(adapter);
+    return _postBean;
+  }
+
+  PivotBean get pivotBean {
+    _pivotBean ??= new PivotBean(adapter);
+    return _pivotBean;
+  }
 
   /// Finds all items
   Future<List<Item>> findAll() async => (await execFind(finder)).toList();

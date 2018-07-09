@@ -59,7 +59,7 @@ abstract class _PostBean implements Bean<Post> {
     if (cascade) {
       Post newModel;
       if (model.items != null) {
-        newModel ??= await find(model.id);
+        newModel ??= await find(retId);
         for (final child in model.items) {
           await itemBean.insert(child);
           await pivotBean.attach(model, child);
@@ -125,7 +125,6 @@ abstract class _PostBean implements Bean<Post> {
   }
 
   Future preloadAll(List<Post> models, {bool cascade: false}) async {}
-
   PivotBean get pivotBean;
 
   ItemBean get itemBean;

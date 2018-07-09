@@ -25,6 +25,16 @@ class Pivot {
 class PivotBean extends Bean<Pivot> with _PivotBean {
   PivotBean(Adapter adapter) : super(adapter);
 
-  final ItemBean itemBean;
-  final PostBean postBean;
+  ItemBean _itemBean;
+  PostBean _postBean;
+
+  PostBean get postBean {
+    _postBean ??= new PostBean(adapter);
+    return _postBean;
+  }
+
+  ItemBean get itemBean {
+    _itemBean ??= new ItemBean(adapter);
+    return _itemBean;
+  }
 }

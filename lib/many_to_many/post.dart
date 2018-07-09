@@ -42,6 +42,7 @@ class Post {
 class PostBean extends Bean<Post> with _PostBean {
   PostBean(Adapter adapter)
       : itemBean = ItemBean(adapter),
+        pivotBean = PivotBean(adapter),
         super(adapter);
 
   final ItemBean itemBean;

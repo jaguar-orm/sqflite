@@ -52,7 +52,7 @@ void main() async {
 
     // Insert some posts
     sb.writeln('Inserting sample rows ...');
-    var post = new Post.make(null, 'Coffee?', 4.5, false, DateTime.now(),
+    var post = new Post.make(1, 'Coffee?', 4.5, false, DateTime.now(),
         [new Item.make(1, 'test'), new Item.make(2, 'test 2')]);
     int id1 = await bean.insert(post, cascade: true);
     sb.writeln(
@@ -66,36 +66,8 @@ void main() async {
     sb.writeln(post1);
     sb.writeln('--------------');
 
-    // Find all posts
-    sb.writeln('Reading all rows ...');
-    List<Post> posts = await bean.findAll();
-    posts.forEach((p) => sb.writeln(p));
-    sb.writeln('--------------');
-
-    // Update a post
-    sb.write('Updating a column in row with id $id1 ...');
-    await bean.updateReadField(id1, true);
-    sb.writeln(' successful!');
-    sb.writeln('--------------');
-
-    // Find one post
-    sb.writeln('Reading row with $id1 to check the update ...');
-    post1 = await bean.find(id1);
-    sb.writeln(post1);
-    sb.writeln('--------------');
-
     sb.writeln('Removing row with id $id1 ...');
     await bean.remove(id1);
-    sb.writeln('--------------');
-
-    // Find all posts
-    sb.writeln('Reading all rows ...');
-    posts = await bean.findAll();
-    posts.forEach((p) => sb.writeln(p));
-    sb.writeln('--------------');
-
-    sb.writeln('Removing all rows ...');
-    await bean.removeAll();
     sb.writeln('--------------');
 
     sb.write('Closing the connection ...');

@@ -110,7 +110,6 @@ abstract class _ItemBean implements Bean<Item> {
   }
 
   Future preloadAll(List<Item> models, {bool cascade: false}) async {}
-
   PivotBean get pivotBean;
 
   PostBean get postBean;
