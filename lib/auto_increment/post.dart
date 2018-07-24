@@ -28,11 +28,11 @@ class Post {
 
   String toString() =>
       'Post(id: $id, message: $msg, stars: $stars, read: $read, at: $at)';
-
-  static String get tableName => 'posts';
 }
 
 @GenBean()
 class PostBean extends Bean<Post> with _PostBean {
   PostBean(Adapter adapter) : super(adapter);
+
+  final String tableName = 'posts';
 }

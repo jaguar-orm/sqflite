@@ -64,7 +64,7 @@ void main() async {
 
     // Find all posts
     sb.writeln('Reading all rows ...');
-    List<Post> posts = await bean.findAll();
+    List<Post> posts = await bean.getAll();
     posts.forEach((p) => sb.writeln(p));
     sb.writeln('--------------');
 
@@ -86,7 +86,7 @@ void main() async {
 
     // Find all posts
     sb.writeln('Reading all rows ...');
-    posts = await bean.findAll();
+    posts = await bean.getAll();
     posts.forEach((p) => sb.writeln(p));
     sb.writeln('--------------');
 

@@ -28,8 +28,6 @@ class Post {
 
   String toString() =>
       'Post(id: $id, message: $msg, stars: $stars, read: $read, at: $at)';
-
-  static String get tableName => 'posts';
 }
 
 @GenBean()
@@ -38,6 +36,8 @@ class PostBean extends Bean<Post> with _PostBean {
 
   Future<int> updateReadField(int id, bool read) async {
     Update st = updater.where(this.id.eq(id)).set(this.read, read);
-    return execUpdate(st);
+    return adapter.update(st);
   }
+
+  final String tableName = 'posts';
 }

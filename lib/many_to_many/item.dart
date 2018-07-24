@@ -22,10 +22,6 @@ class Item {
 
   @ManyToMany(PivotBean, PostBean)
   List<Post> posts;
-
-  String toString() => 'Item(id: $id, message: $msg)';
-
-  static String get tableName => 'items';
 }
 
 @GenBean()
@@ -45,6 +41,5 @@ class ItemBean extends Bean<Item> with _ItemBean {
     return _pivotBean;
   }
 
-  /// Finds all items
-  Future<List<Item>> findAll() async => (await execFind(finder)).toList();
+  final String tableName = 'items';
 }

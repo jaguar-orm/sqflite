@@ -23,14 +23,15 @@ class Item {
   int postId;
 
   String toString() => 'Item(id: $id, message: $msg)';
-
-  static String get tableName => 'items';
 }
 
 @GenBean()
 class ItemBean extends Bean<Item> with _ItemBean {
+  PostBean _postBean;
+
+  PostBean get postBean => _postBean ??= new PostBean(adapter);
+
   ItemBean(Adapter adapter) : super(adapter);
 
-  /// Finds all items
-  Future<List<Item>> findAll() async => (await execFind(finder)).toList();
+  final String tableName = 'items';
 }

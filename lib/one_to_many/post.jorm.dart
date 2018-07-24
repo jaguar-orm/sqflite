@@ -7,18 +7,19 @@ part of 'post.dart';
 // **************************************************************************
 
 abstract class _PostBean implements Bean<Post> {
-  String get tableName => Post.tableName;
-
-  final IntField id = new IntField('id');
-
-  final StrField msg = new StrField('msg');
-
-  final BoolField read = new BoolField('read');
-
-  final DoubleField stars = new DoubleField('stars');
-
-  final DateTimeField at = new DateTimeField('at');
-
+  final id = new IntField('id');
+  final msg = new StrField('msg');
+  final read = new BoolField('read');
+  final stars = new DoubleField('stars');
+  final at = new DateTimeField('at');
+  Map<String, Field> _fields;
+  Map<String, Field> get fields => _fields ??= {
+        id.name: id,
+        msg.name: msg,
+        read.name: read,
+        stars.name: stars,
+        at.name: at,
+      };
   Post fromMap(Map map) {
     Post model = new Post();
 
@@ -31,49 +32,59 @@ abstract class _PostBean implements Bean<Post> {
     return model;
   }
 
-  List<SetColumn> toSetColumns(Post model, [bool update = false]) {
+  List<SetColumn> toSetColumns(Post model,
+      {bool update = false, Set<String> only}) {
     List<SetColumn> ret = [];
 
-    ret.add(id.set(model.id));
-    ret.add(msg.set(model.msg));
-    ret.add(read.set(model.read));
-    ret.add(stars.set(model.stars));
-    ret.add(at.set(model.at));
+    if (only == null) {
+      ret.add(id.set(model.id));
+      ret.add(msg.set(model.msg));
+      ret.add(read.set(model.read));
+      ret.add(stars.set(model.stars));
+      ret.add(at.set(model.at));
+    } else {
+      if (only.contains(id.name)) ret.add(id.set(model.id));
+      if (only.contains(msg.name)) ret.add(msg.set(model.msg));
+      if (only.contains(read.name)) ret.add(read.set(model.read));
+      if (only.contains(stars.name)) ret.add(stars.set(model.stars));
+      if (only.contains(at.name)) ret.add(at.set(model.at));
+    }
 
     return ret;
   }
 
-  Future createTable() async {
+  Future<void> createTable() async {
     final st = Sql.create(tableName);
     st.addInt(id.name, primary: true, autoIncrement: true);
     st.addStr(msg.name);
     st.addBool(read.name);
     st.addInt(stars.name);
     st.addDateTime(at.name);
-    return execCreateTable(st);
+    return adapter.createTable(st);
   }
 
   Future<dynamic> insert(Post model, {bool cascade: false}) async {
-    final Insert insert = inserter.setMany(toSetColumns(model));
-    var retId = await execInsert(insert);
+    final Insert insert = inserter.setMany(toSetColumns(model))..id(id.name);
+    final ret = await adapter.insert(insert);
     if (cascade) {
       Post newModel;
       if (model.items != null) {
-        newModel ??= await find(retId);
+        newModel ??= await find(ret);
         model.items.forEach((x) => itemBean.associatePost(x, newModel));
         for (final child in model.items) {
           await itemBean.insert(child);
         }
       }
     }
-    return retId;
+    return ret;
   }
 
   Future<int> update(Post model,
-      {bool cascade: false, bool associate: false}) async {
-    final Update update =
-        updater.where(this.id.eq(model.id)).setMany(toSetColumns(model));
-    final ret = execUpdate(update);
+      {bool cascade: false, bool associate: false, Set<String> only}) async {
+    final Update update = updater
+        .where(this.id.eq(model.id))
+        .setMany(toSetColumns(model, only: only));
+    final ret = adapter.update(update);
     if (cascade) {
       Post newModel;
       if (model.items != null) {
@@ -91,16 +102,11 @@ abstract class _PostBean implements Bean<Post> {
 
   Future<Post> find(int id, {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
-    final Post model = await execFindOne(find);
+    final Post model = await findOne(find);
     if (preload) {
       await this.preload(model, cascade: cascade);
     }
     return model;
-  }
-
-  Future<List<Post>> findWhere(Expression exp) async {
-    final Find find = finder.where(exp);
-    return await (await execFind(find)).toList();
   }
 
   Future<int> remove(int id, [bool cascade = false]) async {
@@ -109,7 +115,7 @@ abstract class _PostBean implements Bean<Post> {
       await itemBean.removeByPost(newModel.id);
     }
     final Remove remove = remover.where(this.id.eq(id));
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
   Future<int> removeMany(List<Post> models) async {
@@ -117,21 +123,17 @@ abstract class _PostBean implements Bean<Post> {
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
-  Future<int> removeWhere(Expression exp) async {
-    return execRemove(remover.where(exp));
-  }
-
-  Future preload(Post model, {bool cascade: false}) async {
+  Future<void> preload(Post model, {bool cascade: false}) async {
     model.items =
         await itemBean.findByPost(model.id, preload: cascade, cascade: cascade);
   }
 
-  Future preloadAll(List<Post> models, {bool cascade: false}) async {
+  Future<void> preloadAll(List<Post> models, {bool cascade: false}) async {
     models.forEach((Post model) => model.items ??= []);
-    await PreloadHelper.preload<Post, Item>(
+    await OneToXHelper.preloadAll<Post, Item>(
         models,
         (Post model) => [model.id],
         itemBean.findByPostList,

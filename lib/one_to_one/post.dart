@@ -50,6 +50,8 @@ class PostBean extends Bean<Post> with _PostBean {
 
   Future<int> updateReadField(int id, bool read) async {
     Update st = updater.where(this.id.eq(id)).set(this.read, read);
-    return execUpdate(st);
+    return adapter.update(st);
   }
+
+  final String tableName = 'posts';
 }
