@@ -6,82 +6,139 @@ part of 'post.dart';
 // BeanGenerator
 // **************************************************************************
 
-/*
-NoSuchMethodError: The getter 'type' was called on null.
-Receiver: null
-Tried calling: type
-#0      Object.noSuchMethod (dart:core-patch/dart:core/object_patch.dart:46)
-#1      ParsedBean._parseFields.<anonymous closure> (package:jaguar_orm_gen/src/parser/parser.dart:281:69)
-#2      WhereIterator.moveNext (dart:_internal/iterable.dart:439)
-#3      Iterable.length (dart:core/iterable.dart:427)
-#4      ParsedBean._parseFields (package:jaguar_orm_gen/src/parser/parser.dart:282:14)
-#5      ParsedBean.detect (package:jaguar_orm_gen/src/parser/parser.dart:51:5)
-#6      ParsedBean.parseRelation (package:jaguar_orm_gen/src/parser/parser.dart:376:63)
-#7      ParsedBean._relation (package:jaguar_orm_gen/src/parser/parser.dart:335:5)
-#8      ParsedBean._parseFields (package:jaguar_orm_gen/src/parser/parser.dart:298:14)
-#9      ParsedBean.detect (package:jaguar_orm_gen/src/parser/parser.dart:51:5)
-#10     BeanGenerator.generateForAnnotatedElement (package:jaguar_orm_gen/src/hook/hook.dart:38:56)
-<asynchronous suspension>
-#11     GeneratorForAnnotation.generate (package:source_gen/src/generator_for_annotation.dart:42:28)
-<asynchronous suspension>
-#12     _generate (package:source_gen/src/builder.dart:213:35)
-<asynchronous suspension>
-#13     _Builder._generateForLibrary (package:source_gen/src/builder.dart:74:15)
-<asynchronous suspension>
-#14     _Builder.build (package:source_gen/src/builder.dart:68:11)
-<asynchronous suspension>
-#15     runBuilder.buildForInput (package:build/src/generate/run_builder.dart:43:21)
-<asynchronous suspension>
-#16     MappedListIterable.elementAt (dart:_internal/iterable.dart:414)
-#17     ListIterator.moveNext (dart:_internal/iterable.dart:343)
-#18     Future.wait (dart:async/future.dart:385)
-#19     runBuilder.<anonymous closure> (package:build/src/generate/run_builder.dart:49:36)
-#20     _rootRun (dart:async/zone.dart:1126)
-#21     _CustomZone.run (dart:async/zone.dart:1023)
-#22     runZoned (dart:async/zone.dart:1490)
-#23     scopeLogAsync (package:build/src/builder/logging.dart:22:3)
-#24     runBuilder (package:build/src/generate/run_builder.dart:49:9)
-<asynchronous suspension>
-#25     _SingleBuild._runForInput.<anonymous closure> (package:build_runner_core/src/generate/build_impl.dart:424:15)
-#26     _NoOpBuilderActionTracker.track (package:build_runner_core/src/generate/performance_tracker.dart:246:73)
-#27     _SingleBuild._runForInput (package:build_runner_core/src/generate/build_impl.dart:423:19)
-<asynchronous suspension>
-#28     _SingleBuild._runBuilder.<anonymous closure> (package:build_runner_core/src/generate/build_impl.dart:349:38)
-#29     MappedIterator.moveNext (dart:_internal/iterable.dart:392)
-#30     Future.wait (dart:async/future.dart:385)
-#31     _SingleBuild._runBuilder (package:build_runner_core/src/generate/build_impl.dart:348:36)
-<asynchronous suspension>
-#32     _SingleBuild._runPhases.<anonymous closure> (package:build_runner_core/src/generate/build_impl.dart:296:32)
-<asynchronous suspension>
-#33     _NoOpBuildPerformanceTracker.trackBuildPhase (package:build_runner_core/src/generate/performance_tracker.dart:140:15)
-#34     _SingleBuild._runPhases (package:build_runner_core/src/generate/build_impl.dart:292:33)
-<asynchronous suspension>
-#35     logTimedAsync (package:build_runner_core/src/logging/logging.dart:25:30)
-<asynchronous suspension>
-#36     _SingleBuild._safeBuild.<anonymous closure> (package:build_runner_core/src/generate/build_impl.dart:260:26)
-<asynchronous suspension>
-#37     _rootRun (dart:async/zone.dart:1126)
-#38     _CustomZone.run (dart:async/zone.dart:1023)
-#39     runZoned (dart:async/zone.dart:1490)
-#40     _SingleBuild._safeBuild (package:build_runner_core/src/generate/build_impl.dart:255:5)
-#41     _SingleBuild.run (package:build_runner_core/src/generate/build_impl.dart:185:24)
-<asynchronous suspension>
-#42     BuildImpl.run (package:build_runner_core/src/generate/build_impl.dart:89:30)
-#43     BuildRunner.run (package:build_runner_core/src/generate/build_runner.dart:23:14)
-#44     build (package:build_runner/src/generate/build.dart:98:30)
-<asynchronous suspension>
-#45     BuildCommand.run (package:build_runner/src/entrypoint/build.dart:28:24)
-<asynchronous suspension>
-#46     CommandRunner.runCommand (package:args/command_runner.dart:194:27)
-<asynchronous suspension>
-#47     CommandRunner.run.<anonymous closure> (package:args/command_runner.dart:109:29)
-#48     new Future.sync (dart:async/future.dart:222)
-#49     CommandRunner.run (package:args/command_runner.dart:109:11)
-#50     run (package:build_runner/src/entrypoint/run.dart:22:31)
-<asynchronous suspension>
-#51     main (file:///C:/Users/Issac/projects/jaguar_examples/sqflite/.dart_tool/build/entrypoint/build.dart:10:22)
-<asynchronous suspension>
-#52     _startIsolate.<anonymous closure> (dart:isolate-patch/dart:isolate/isolate_patch.dart:275)
-#53     _RawReceivePortImpl._handleMessage (dart:isolate-patch/dart:isolate/isolate_patch.dart:165)
+abstract class _PostBean implements Bean<Post> {
+  final id = new IntField('id');
+  final msg = new StrField('msg');
+  final read = new BoolField('read');
+  final stars = new DoubleField('stars');
+  final at = new DateTimeField('at');
+  Map<String, Field> _fields;
+  Map<String, Field> get fields => _fields ??= {
+        id.name: id,
+        msg.name: msg,
+        read.name: read,
+        stars.name: stars,
+        at.name: at,
+      };
+  Post fromMap(Map map) {
+    Post model = new Post();
 
-*/
+    model.id = adapter.parseValue(map['id']);
+    model.msg = adapter.parseValue(map['msg']);
+    model.read = adapter.parseValue(map['read']);
+    model.stars = adapter.parseValue(map['stars']);
+    model.at = adapter.parseValue(map['at']);
+
+    return model;
+  }
+
+  List<SetColumn> toSetColumns(Post model,
+      {bool update = false, Set<String> only}) {
+    List<SetColumn> ret = [];
+
+    if (only == null) {
+      ret.add(id.set(model.id));
+      ret.add(msg.set(model.msg));
+      ret.add(read.set(model.read));
+      ret.add(stars.set(model.stars));
+      ret.add(at.set(model.at));
+    } else {
+      if (only.contains(id.name)) ret.add(id.set(model.id));
+      if (only.contains(msg.name)) ret.add(msg.set(model.msg));
+      if (only.contains(read.name)) ret.add(read.set(model.read));
+      if (only.contains(stars.name)) ret.add(stars.set(model.stars));
+      if (only.contains(at.name)) ret.add(at.set(model.at));
+    }
+
+    return ret;
+  }
+
+  Future<void> createTable() async {
+    final st = Sql.create(tableName);
+    st.addInt(id.name, primary: true, autoIncrement: true);
+    st.addStr(msg.name);
+    st.addBool(read.name);
+    st.addInt(stars.name);
+    st.addDateTime(at.name);
+    return adapter.createTable(st);
+  }
+
+  Future<dynamic> insert(Post model, {bool cascade: false}) async {
+    final Insert insert = inserter.setMany(toSetColumns(model))..id(id.name);
+    final ret = await adapter.insert(insert);
+    if (cascade) {
+      Post newModel;
+      if (model.items != null) {
+        newModel ??= await find(ret);
+        for (final child in model.items) {
+          await itemBean.insert(child);
+          await pivotBean.attach(model, child);
+        }
+      }
+    }
+    return ret;
+  }
+
+  Future<int> update(Post model,
+      {bool cascade: false, bool associate: false, Set<String> only}) async {
+    final Update update = updater
+        .where(this.id.eq(model.id))
+        .setMany(toSetColumns(model, only: only));
+    final ret = adapter.update(update);
+    if (cascade) {
+      Post newModel;
+      if (model.items != null) {
+        for (final child in model.items) {
+          await await itemBean.update(child);
+        }
+      }
+    }
+    return ret;
+  }
+
+  Future<Post> find(int id, {bool preload: false, bool cascade: false}) async {
+    final Find find = finder.where(this.id.eq(id));
+    final Post model = await findOne(find);
+    if (preload) {
+      await this.preload(model, cascade: cascade);
+    }
+    return model;
+  }
+
+  Future<int> remove(int id, [bool cascade = false]) async {
+    if (cascade) {
+      final Post newModel = await find(id);
+      await pivotBean.detachPost(newModel);
+    }
+    final Remove remove = remover.where(this.id.eq(id));
+    return adapter.remove(remove);
+  }
+
+  Future<int> removeMany(List<Post> models) async {
+    final Remove remove = remover;
+    for (final model in models) {
+      remove.or(this.id.eq(model.id));
+    }
+    return adapter.remove(remove);
+  }
+
+  Future<void> preload(Post model, {bool cascade: false}) async {
+    model.items = await pivotBean.fetchByPost(model);
+  }
+
+  Future<void> preloadAll(List<Post> models, {bool cascade: false}) async {
+    for (Post model in models) {
+      var temp = await pivotBean.fetchByPost(model);
+      if (model.items == null)
+        model.items = temp;
+      else {
+        model.items.clear();
+        model.items.addAll(temp);
+      }
+    }
+  }
+
+  PivotBean get pivotBean;
+
+  ItemBean get itemBean;
+}

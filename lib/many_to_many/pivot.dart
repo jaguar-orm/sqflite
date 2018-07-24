@@ -12,13 +12,11 @@ part 'pivot.jorm.dart';
 class Pivot {
   Pivot();
 
-  @BelongsToMany(PostBean)
+  @BelongsTo.many(PostBean)
   int postId;
 
-  @BelongsToMany(ItemBean)
+  @BelongsTo.many(ItemBean)
   int itemId;
-
-  static String tableName = 'pivot';
 }
 
 @GenBean()
@@ -37,4 +35,6 @@ class PivotBean extends Bean<Pivot> with _PivotBean {
     _itemBean ??= new ItemBean(adapter);
     return _itemBean;
   }
+
+  final String tableName = 'pivot';
 }
