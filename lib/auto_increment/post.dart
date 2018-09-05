@@ -11,19 +11,19 @@ class Post {
 
   Post.make(this.id, this.msg, this.stars, this.read, this.at);
 
-  @PrimaryKey(autoIncrement: true)
+  @PrimaryKey(auto: true)
   int id;
 
-  @Column(nullable: true)
+  @Column(isNullable: true)
   String msg;
 
-  @Column(nullable: true)
+  @Column(isNullable: true)
   bool read;
 
-  @Column(nullable: true)
+  @Column(isNullable: true)
   double stars;
 
-  @Column(nullable: true)
+  @Column(isNullable: true)
   DateTime at;
 
   String toString() =>

@@ -17,7 +17,7 @@ class Item {
   @PrimaryKey()
   int id;
 
-  @Column(nullable: true)
+  @Column(isNullable: true)
   String msg;
 
   @ManyToMany(PivotBean, PostBean)
