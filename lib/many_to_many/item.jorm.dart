@@ -40,8 +40,8 @@ abstract class _ItemBean implements Bean<Item> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addInt(id.name, primary: true);
-    st.addStr(msg.name);
+    st.addInt(id.name, primary: true, isNullable: false);
+    st.addStr(msg.name, isNullable: true);
     return adapter.createTable(st);
   }
 
@@ -61,6 +61,21 @@ abstract class _ItemBean implements Bean<Item> {
     return retId;
   }
 
+  Future<void> insertMany(List<Item> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(insert(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data =
+          models.map((model) => toSetColumns(model)).toList();
+      final InsertMany insert = inserters.addAll(data);
+      return adapter.insertMany(insert);
+    }
+  }
+
   Future<int> update(Item model,
       {bool cascade: false, bool associate: false, Set<String> only}) async {
     final Update update = updater
@@ -76,6 +91,26 @@ abstract class _ItemBean implements Bean<Item> {
       }
     }
     return ret;
+  }
+
+  Future<void> updateMany(List<Item> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(update(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data = [];
+      final List<Expression> where = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+        where.add(this.id.eq(model.id));
+      }
+      final UpdateMany update = updaters.addAll(data, where);
+      return adapter.updateMany(update);
+    }
   }
 
   Future<Item> find(int id, {bool preload: false, bool cascade: false}) async {
@@ -104,11 +139,13 @@ abstract class _ItemBean implements Bean<Item> {
     return adapter.remove(remove);
   }
 
-  Future<void> preload(Item model, {bool cascade: false}) async {
+  Future<Item> preload(Item model, {bool cascade: false}) async {
     model.posts = await pivotBean.fetchByItem(model);
+    return model;
   }
 
-  Future<void> preloadAll(List<Item> models, {bool cascade: false}) async {
+  Future<List<Item>> preloadAll(List<Item> models,
+      {bool cascade: false}) async {
     for (Item model in models) {
       var temp = await pivotBean.fetchByItem(model);
       if (model.posts == null)
@@ -118,6 +155,7 @@ abstract class _ItemBean implements Bean<Item> {
         model.posts.addAll(temp);
       }
     }
+    return models;
   }
 
   PivotBean get pivotBean;

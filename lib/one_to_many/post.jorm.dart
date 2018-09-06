@@ -55,11 +55,11 @@ abstract class _PostBean implements Bean<Post> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addInt(id.name, primary: true, autoIncrement: true);
-    st.addStr(msg.name);
-    st.addBool(read.name);
-    st.addInt(stars.name);
-    st.addDateTime(at.name);
+    st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
+    st.addStr(msg.name, isNullable: true);
+    st.addBool(read.name, isNullable: true);
+    st.addDouble(stars.name, isNullable: true);
+    st.addDateTime(at.name, isNullable: true);
     return adapter.createTable(st);
   }
 
@@ -77,6 +77,21 @@ abstract class _PostBean implements Bean<Post> {
       }
     }
     return ret;
+  }
+
+  Future<void> insertMany(List<Post> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(insert(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data =
+          models.map((model) => toSetColumns(model)).toList();
+      final InsertMany insert = inserters.addAll(data);
+      return adapter.insertMany(insert);
+    }
   }
 
   Future<int> update(Post model,
@@ -98,6 +113,26 @@ abstract class _PostBean implements Bean<Post> {
       }
     }
     return ret;
+  }
+
+  Future<void> updateMany(List<Post> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(update(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data = [];
+      final List<Expression> where = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+        where.add(this.id.eq(model.id));
+      }
+      final UpdateMany update = updaters.addAll(data, where);
+      return adapter.updateMany(update);
+    }
   }
 
   Future<Post> find(int id, {bool preload: false, bool cascade: false}) async {
@@ -126,12 +161,14 @@ abstract class _PostBean implements Bean<Post> {
     return adapter.remove(remove);
   }
 
-  Future<void> preload(Post model, {bool cascade: false}) async {
+  Future<Post> preload(Post model, {bool cascade: false}) async {
     model.items =
         await itemBean.findByPost(model.id, preload: cascade, cascade: cascade);
+    return model;
   }
 
-  Future<void> preloadAll(List<Post> models, {bool cascade: false}) async {
+  Future<List<Post>> preloadAll(List<Post> models,
+      {bool cascade: false}) async {
     models.forEach((Post model) => model.items ??= []);
     await OneToXHelper.preloadAll<Post, Item>(
         models,
@@ -140,6 +177,7 @@ abstract class _PostBean implements Bean<Post> {
         (Item model) => [model.postId],
         (Post model, Item child) => model.items.add(child),
         cascade: cascade);
+    return models;
   }
 
   ItemBean get itemBean;

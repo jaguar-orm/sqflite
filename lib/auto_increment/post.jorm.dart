@@ -55,11 +55,11 @@ abstract class _PostBean implements Bean<Post> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addInt(id.name, primary: true, autoIncrement: true);
-    st.addStr(msg.name);
-    st.addBool(read.name);
-    st.addInt(stars.name);
-    st.addDateTime(at.name);
+    st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
+    st.addStr(msg.name, isNullable: true);
+    st.addBool(read.name, isNullable: true);
+    st.addDouble(stars.name, isNullable: true);
+    st.addDateTime(at.name, isNullable: true);
     return adapter.createTable(st);
   }
 
@@ -68,11 +68,30 @@ abstract class _PostBean implements Bean<Post> {
     return adapter.insert(insert);
   }
 
+  Future<void> insertMany(List<Post> models) async {
+    final List<List<SetColumn>> data =
+        models.map((model) => toSetColumns(model)).toList();
+    final InsertMany insert = inserters.addAll(data);
+    return adapter.insertMany(insert);
+  }
+
   Future<int> update(Post model, {Set<String> only}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
     return adapter.update(update);
+  }
+
+  Future<void> updateMany(List<Post> models) async {
+    final List<List<SetColumn>> data = [];
+    final List<Expression> where = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+      where.add(this.id.eq(model.id));
+    }
+    final UpdateMany update = updaters.addAll(data, where);
+    return adapter.updateMany(update);
   }
 
   Future<Post> find(int id, {bool preload: false, bool cascade: false}) async {

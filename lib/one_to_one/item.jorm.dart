@@ -45,9 +45,10 @@ abstract class _ItemBean implements Bean<Item> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addInt(id.name, primary: true);
-    st.addStr(msg.name);
-    st.addInt(postId.name, foreignTable: postBean.tableName, foreignCol: 'id');
+    st.addInt(id.name, primary: true, isNullable: false);
+    st.addStr(msg.name, isNullable: true);
+    st.addInt(postId.name,
+        foreignTable: postBean.tableName, foreignCol: 'id', isNullable: false);
     return adapter.createTable(st);
   }
 
@@ -56,11 +57,30 @@ abstract class _ItemBean implements Bean<Item> {
     return adapter.insert(insert);
   }
 
+  Future<void> insertMany(List<Item> models) async {
+    final List<List<SetColumn>> data =
+        models.map((model) => toSetColumns(model)).toList();
+    final InsertMany insert = inserters.addAll(data);
+    return adapter.insertMany(insert);
+  }
+
   Future<int> update(Item model, {Set<String> only}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
     return adapter.update(update);
+  }
+
+  Future<void> updateMany(List<Item> models) async {
+    final List<List<SetColumn>> data = [];
+    final List<Expression> where = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+      where.add(this.id.eq(model.id));
+    }
+    final UpdateMany update = updaters.addAll(data, where);
+    return adapter.updateMany(update);
   }
 
   Future<Item> find(int id, {bool preload: false, bool cascade: false}) async {

@@ -40,14 +40,35 @@ abstract class _PivotBean implements Bean<Pivot> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addInt(postId.name, foreignTable: postBean.tableName, foreignCol: 'id');
-    st.addInt(itemId.name, foreignTable: itemBean.tableName, foreignCol: 'id');
+    st.addInt(postId.name,
+        foreignTable: postBean.tableName, foreignCol: 'id', isNullable: false);
+    st.addInt(itemId.name,
+        foreignTable: itemBean.tableName, foreignCol: 'id', isNullable: false);
     return adapter.createTable(st);
   }
 
   Future<dynamic> insert(Pivot model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return adapter.insert(insert);
+  }
+
+  Future<void> insertMany(List<Pivot> models) async {
+    final List<List<SetColumn>> data =
+        models.map((model) => toSetColumns(model)).toList();
+    final InsertMany insert = inserters.addAll(data);
+    return adapter.insertMany(insert);
+  }
+
+  Future<void> updateMany(List<Pivot> models) async {
+    final List<List<SetColumn>> data = [];
+    final List<Expression> where = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+      where.add(null);
+    }
+    final UpdateMany update = updaters.addAll(data, where);
+    return adapter.updateMany(update);
   }
 
   Future<List<Pivot>> findByPost(int postId,
