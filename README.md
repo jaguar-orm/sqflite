@@ -1,8 +1,21 @@
 # sqflite Jaguar ORM example
 
-Showcases how to use Jaguar ORM, Jaguar Query and sqflite in Flutter.
+Showcases how to use Jaguar ORM, Jaguar Query and sqflite in your Flutter
+apps.
 
-Running this project should show the following result:
+Run the individual examples as follows:
+
+    $ flutter run lib/basic/main.dart
+
+    $ flutter run lib/one_to_one/main.dart
+
+    $ flutter run lib/auto_increment/main.dart
+
+    $ flutter run lib/one_to_many/main.dart
+
+    $ flutter run lib/many_to_many/main.dart
+
+Running the [basic example](https://github.com/jaguar-orm/sqflite/blob/master/lib/basic/main.dart) should show the following result:
 
 ```
 I/flutter ( 5464): Jaguar ORM showcase:
